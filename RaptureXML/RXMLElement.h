@@ -85,7 +85,10 @@
 - (NSInteger)attributeAsInt:(NSString *)attributeName inNamespace:(NSString *)ns;
 
 - (double)attributeAsDouble:(NSString *)attributeName;
+- (double)attributeAsDouble:(NSString *)attributeName usingLocale:(NSLocale *)locale;
 - (double)attributeAsDouble:(NSString *)attributeName inNamespace:(NSString *)ns;
+
+- (NSDate *)attributeAsDate:(NSString *)attributeName usingFormatter:(NSDateFormatter *)formatter;
 
 - (RXMLElement *)child:(NSString *)tag;
 - (RXMLElement *)child:(NSString *)tag inNamespace:(NSString *)ns;

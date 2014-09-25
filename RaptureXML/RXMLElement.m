@@ -293,11 +293,54 @@
 }
 
 - (double)attributeAsDouble:(NSString *)attName {
-    return [[self attribute:attName] doubleValue];
+	return [self attributeAsDouble:attName usingLocale:[RXMLElement defaultLocale]];
+}
+
+- (double)attributeAsDouble:(NSString *)attName usingLocale:(NSLocale *)locale {
+	NSString *value = [self attribute:attName];
+	return [self stringValueToDouble:value usingLocale:locale];
 }
 
 - (double)attributeAsDouble:(NSString *)attName inNamespace:(NSString *)ns {
-    return [[self attribute:attName inNamespace:ns] doubleValue];
+	NSString *value = [self attribute:attName inNamespace:ns];
+	return [self stringValueToDouble:value usingLocale:[RXMLElement defaultLocale]];
+}
+
++ (NSLocale *)defaultLocale {
+	static NSLocale *defaultLocale;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		defaultLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"IT"];
+	});
+	return defaultLocale;
+}
+
+- (double)stringValueToDouble:(NSString *)attrValue usingLocale:(NSLocale *)locale {
+	if (attrValue && attrValue.length > 0) {
+		double ret;
+		NSScanner *scanner = [NSScanner scannerWithString:attrValue];
+		[scanner setLocale:locale];
+		if ([scanner scanDouble:&ret]) {
+			return ret;
+		} else {
+			return 0;
+		}
+	}
+	return 0.0;
+}
+
+- (NSDate *)attributeAsDate:(NSString *)attributeName usingFormatter:(NSDateFormatter *)formatter {
+	NSDate *date;
+	NSString *value = [self attribute:attributeName];
+	if ([value rangeOfString:@"/"].location == NSNotFound) {
+		double dtValue = [value doubleValue];
+		if (dtValue > 0) {
+			date = [NSDate dateWithTimeIntervalSince1970:dtValue];
+		}
+	} else {
+		date = [formatter dateFromString:value];
+	}
+	return date;
 }
 
 - (BOOL)isValid {
